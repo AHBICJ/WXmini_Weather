@@ -22,7 +22,13 @@ Page({
     nowWeather:'',
     nowWeatherBackground:'',
   },
-  onLoad(){
+  onLoad(){this.getNow()},
+  onPullDownRefresh() {
+    this.getNow(() => {
+      wx.stopPullDownRefresh()
+    })
+  },
+  getNow(callback){
     wx.request({
       url: 'https://test-miniprogram.com/api/weather/now',
       data: {
@@ -37,7 +43,7 @@ Page({
         let weather = result.now.weather;
         this.setData({
           nowTemp: temp + "°",
-          nowWeather:weatherMap[weather],
+          nowWeather: weatherMap[weather],
           nowWeatherBackground: `/images/${weather}-bg.png`,
         });
         wx.setNavigationBarColor({
@@ -48,6 +54,9 @@ Page({
             timingFunc: 'easeIn'
           }
         })
+      },
+      complete:()=>{
+        callback && callback()
       }
     })
   }
